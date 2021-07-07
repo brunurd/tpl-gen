@@ -1,0 +1,6 @@
+# poetry
+.venv/
+
+# misc
+.env
+*.log
