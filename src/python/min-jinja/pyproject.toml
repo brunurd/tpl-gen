@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "min-jinja"
+version = "1.0.0"
+description = "A minimalistic python jinja temlate engine demonstrator."
+authors = ["Bruno Araujo <brunurd@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.25.1"
+pprintjson = "^1.4.2"
+pylint = "^2.9.3"
+pytest = "^6.2.4"
+jinja2 = "^3.0.1"
+autopep8 = "^1.5.7"
+colorama = "^0.4.4"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.8.3"
+autopep8 = "^1.5.7"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
