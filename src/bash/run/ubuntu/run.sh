@@ -2,7 +2,6 @@
 # purpose:
 # the runnable script on ubuntu 20.04 - runs generically the runnable functions
 # starting with do_ from the src/bash/run/ubuntu/ubuntu-20.04.2-lts/*.func.sh files
-#
 
 main(){
    do_set_vars "$@"  # is inside, unless --help flag is present
@@ -13,7 +12,6 @@ main(){
     2> >(tee $main_log_dir/$RUN_UNIT.$ts.err.log)
 }
 
-
 main_exec(){
    do_set_fs_permissions
    do_deploy_min_req_bins
@@ -21,7 +19,6 @@ main_exec(){
    do_run_actions "$actions"
    do_log "INFO run ok" && exit 0
 }
-
 
 #------------------------------------------------------------------------------
 # the "reflection" func - identify the the funcs per file
@@ -39,43 +36,39 @@ get_function_list () {
             '
 }
 
-
 do_read_cmd_args() {
-
    img=$(lsb_release -d|grep -i ubuntu |perl -ne '$s=lc($_);$s=~s| |-|g;print $s'|awk '{print $2}')
-	while [[ $# -gt 0 ]]; do
-		case "$1" in
-			-a|--actions) shift && actions="${actions:-}${1:-} " && shift ;;
-			-h|--help) actions=' do_print_usage ' && shift ;;
-			*) echo FATAL unknown "cmd arg: '$1' - invalid cmd arg, probably a typo !!!" && shift && exit 1
+   while [[ $# -gt 0 ]]; do
+      case "$1" in
+         -a|--actions) shift && actions="${actions:-}${1:-} " && shift ;;
+         -h|--help) actions=' do_print_usage ' && shift ;;
+         *) echo FATAL unknown "cmd arg: '$1' - invalid cmd arg, probably a typo !!!" && shift && exit 1
     esac
   done
-	shift $((OPTIND -1))
-
+   shift $((OPTIND -1))
 }
-
 
 do_run_actions(){
    actions=$1
-      cd $PRODUCT_DIR
-      actions=$(echo -e "${actions}"|xargs)' '  #or how-to trim leading space
-      run_funcs=''
-      while read -d ' ' arg_action ; do
-         while read -r fnc_file ; do
-            #debug func fnc_file:$fnc_file
-            while read -r fnc_name ; do
-               #debug fnc_name:$fnc_name
-               action_name=`echo $(basename $fnc_file)|sed -e 's/.func.sh//g'`
-               action_name=`echo do_$action_name|sed -e 's/-/_/g'`
-               #debug  action_name: $action_name
-               test "$action_name" != "$arg_action" && continue
-               source $fnc_file
-               test "$action_name" == "$arg_action" && run_funcs="$(echo -e "${run_funcs}\n$fnc_name")"
-               #debug run_funcs: $run_funcs ; sleep 3
-            done< <(get_function_list "$fnc_file")
-         done < <(find "src/bash/run/ubuntu/ubuntu-20.04.2-lts" -type f -name '*.func.sh'|sort)
+   cd $PRODUCT_DIR
+   actions=$(echo -e "${actions}"|xargs)' '  #or how-to trim leading space
+   run_funcs=''
+   while read -d ' ' arg_action ; do
+      while read -r fnc_file ; do
+         #debug func fnc_file:$fnc_file
+         while read -r fnc_name ; do
+            #debug fnc_name:$fnc_name
+            action_name=`echo $(basename $fnc_file)|sed -e 's/.func.sh//g'`
+            action_name=`echo do_$action_name|sed -e 's/-/_/g'`
+            #debug  action_name: $action_name
+            test "$action_name" != "$arg_action" && continue
+            source $fnc_file
+            test "$action_name" == "$arg_action" && run_funcs="$(echo -e "${run_funcs}\n$fnc_name")"
+            #debug run_funcs: $run_funcs ; sleep 3
+         done< <(get_function_list "$fnc_file")
+      done < <(find "src/bash/run/ubuntu/ubuntu-20.04.2-lts" -type f -name '*.func.sh'|sort)
 
-      done < <(echo "$actions")
+   done < <(echo "$actions")
 
    run_funcs="$(echo -e "${run_funcs}"|sed -e 's/^[[:space:]]*//;/^$/d')"
    test -z $run_funcs && {
@@ -95,14 +88,11 @@ do_run_actions(){
       fi
       do_log "INFO STOP ::: running function :: $run_func"
    done < <(echo "$run_funcs")
-
 }
-
 
 do_flush_screen(){
    printf "\033[2J";printf "\033[0;0H"
 }
-
 
 #------------------------------------------------------------------------------
 # echo pass params and print them to a log file and terminal
@@ -119,18 +109,16 @@ do_log(){
       | tee -a $log_file
 }
 
-
 do_deploy_min_req_bins(){
-	which perl 2> /dev/null || {
+   which perl 2> /dev/null || {
       sudo apt-get update
       sudo apt-get install -y perl
    }
-	which jq 2> /dev/null || {
+   which jq 2> /dev/null || {
       sudo apt-get update
       sudo apt-get install -y jq
    }
 }
-
 
 do_set_vars(){
    set -u -o pipefail
@@ -150,7 +138,6 @@ do_set_vars(){
    cd $PRODUCT_DIR
 }
 
-
 do_read_conf_section(){
    PROJ_CONF_FILE=$PRODUCT_DIR/cnf/env/$ENV_TYPE.env.json
    test -f $PROJ_CONF_FILE || {
@@ -163,9 +150,7 @@ do_read_conf_section(){
    do_export_json_section_vars $PROJ_CONF_FILE "$conf_section"
 }
 
-
 do_set_fs_permissions(){
-
    # Check if is running inside a container to ignore this function.
    test -f /.dockerenv && return 0
 
@@ -185,11 +170,9 @@ do_set_fs_permissions(){
    done
 }
 
-
 do_load_functions(){
-    while read -r f; do source $f; done < <(ls -1 $PRODUCT_DIR/lib/bash/funcs/*.sh)
-    while read -r f; do source $f; done < <(ls -1 $PRODUCT_DIR/src/bash/run/ubuntu/$img/*.func.sh)
- }
-
+   while read -r f; do source $f; done < <(ls -1 $PRODUCT_DIR/lib/bash/funcs/*.sh)
+   while read -r f; do source $f; done < <(ls -1 $PRODUCT_DIR/src/bash/run/ubuntu/$img/*.func.sh)
+}
 
 main "$@"

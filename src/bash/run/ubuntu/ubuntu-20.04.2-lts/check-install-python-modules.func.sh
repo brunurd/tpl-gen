@@ -1,6 +1,5 @@
 #!/bin/bash
 do_check_install_python_modules(){
-
    command -v poetry 1>/dev/null || {
       do_check_install_poetry
       export POETRY_VERSION=1.1.6

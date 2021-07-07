@@ -1,5 +1,5 @@
+#!/bin/bash
 do_print_usage(){
-
    cat << EOF_USAGE
    :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       This is a generic short bash funcs running script with logging
