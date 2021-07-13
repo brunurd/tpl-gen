@@ -15,7 +15,7 @@ VOLUME $PRODUCT_DIR
 ENV TERM="xterm-256color"
 ENV TZ="Etc/UTC"
 
-# start ::: workaround the interactive keyboard problem
+# Workaround to interactive keyboard issue.
 RUN echo \n\
 XKBMODEL="pc105" \n\
 XKBLAYOUT="se" \n\
@@ -23,9 +23,8 @@ XKBVARIANT="" \n\
 XKBOPTIONS="" \n\
 BACKSPACE="guess" \n\
  > /etc/default/keyboard
-# stop ::: workaround the interactive keyboard problem
 
-# start ::: ubuntu 20.04 os utils
+# Install Ubuntu 20.04 os utils.
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y && \
    apt-get install -y --no-install-recommends apt-utils
 RUN export DEBIAN_FRONTEND=noninteractive && ln -fs /usr/share/zoneinfo/UTC /etc/localtime && \
@@ -35,17 +34,15 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y \
         lsb-release sudo curl net-tools wget \
         git zip unzip build-essential linux-headers-5.4.0-1037-aws \
         perl make vim ufw jq snapd debconf-utils dialog telnet
-# stop  ::: ubuntu 20.04 os utils
 
-# start ::: install python bins
+# Install python binaries.
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y python3-pip python3-distutils python3-testresources \
       python3.8-dev python3.8-venv
 RUN ln -sfn /usr/bin/python3.8 /usr/bin/python
 RUN ln -sfn /usr/bin/python3.8 /usr/bin/python3
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get clean all && apt-get install --fix-missing
-# stop ::: install python bins
 
-# start ::: enable host to container edit of proj code on ubuntu and mac.
+# Enable host to container edit of project code on ubuntu and mac.
 RUN test -z $(getent group $GID | cut -d: -f1) || \
       groupmod -g $((GID+1000)) $(getent group $GID | cut -d: -f1)
 
@@ -57,7 +54,7 @@ RUN adduser \
       --uid $UID \
       $USR && exit 0
 
-RUN echo "$USR:1432@lAFk" | chpasswd
+RUN echo "$USR:9748#d4Aj" | chpasswd
 RUN echo "$USR ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 USER $USR
@@ -66,18 +63,12 @@ ENV GROUP=$GRP
 
 USER ubuntu
 ENV USER=ubuntu
-# stop  ::: enable host to container edit of proj code on ubuntu and mac.
 
-
-ADD --chown=$USR:$GRP "." "/home/ubuntu/$PRODUCT_DIR"
-
-# start install python modules via poetry
-WORKDIR /home/ubuntu/$PRODUCT_DIR/src/python/min-jinja
-ENV PYTHONPATH=${PYTHONPATH}:${PWD}
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
-ENV PATH="$HOME/.poetry/bin:${PATH}"
-RUN poetry config virtualenvs.create false && poetry install --no-dev
-# stop install python modules via poetry
-
+# Create volume inside image.
+ADD --chown=$USR:$GRP "." "$PRODUCT_DIR"
 WORKDIR $PRODUCT_DIR
+
+# Install poetry.
+RUN ./run -a do_check_install_poetry
+
 CMD exec /bin/bash -c "./run -a do_check_install_python_modules ; trap : TERM INT; sleep infinity & wait"

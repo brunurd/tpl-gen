@@ -127,14 +127,17 @@ do_set_vars(){
       actions=' do_print_usage ' ; ENV_TYPE='dev'
    }
    [[ -z ${ENV_TYPE:-} && "$actions" != *'do_print_usage'* ]] && {
-      echo "define the ENV_TYPE you are running against !!! For example:"
+      echo -e "\n\nWARNING: define the ENV_TYPE you are running against! For example:"
       for env in `echo dev tst stg prd`; do echo "ENV_TYPE=$env ./run -a <<action>> !!!"; done
-      exit 1
+      echo -e "\n'dev' ENV_TYPE will be used as fallback...\n\n"
+      sleep 3
+      export ENV_TYPE=dev
    }
    cd $PRODUCT_DIR
 }
 
 do_read_conf_section(){
+   echo $ENV_TYPE
    PROJ_CONF_FILE=$PRODUCT_DIR/cnf/env/$ENV_TYPE.env.json
    test -f $PROJ_CONF_FILE || {
       do_log "FATAL could NOT find the configuration file: $PROJ_CONF_FILE"

@@ -28,13 +28,13 @@ do_build_devops_docker_image_no_cache:
 do_create_container: stop_container
 	docker run -d -v $$(pwd):/opt/min-jinja \
    	-v $$HOME/.ssh:/home/ubuntu/.ssh \
-		--name proj-con min-jinja-devops-img ;
-	@echo -e to attach run: "\ndocker exec -it proj-con /bin/bash"
-	@echo -e to get help run: "\ndocker exec -it proj-con ./run --help"
+		--name min-jinja min-jinja-devops-img ;
+	@echo -e to attach run: "\ndocker exec -it min-jinja /bin/bash"
+	@echo -e to get help run: "\ndocker exec -it min-jinja ./run --help"
 
 .PHONY: stop_container ## @-> Stop the devops running container.
 stop_container:
-	-docker container stop $$(docker ps -aqf "name=proj-con") && docker container rm $$(docker ps -aqf "name=proj-con")
+	-docker stop min-jinja && docker rm min-jinja
 
 .PHONY: zip_me ## @-> Zip the whole project without the .git directory.
 zip_me:
@@ -47,7 +47,7 @@ demand_var-%:
 		exit 1; \
 	fi
 
-task-which-requires-a-var: demand_var-ENV_TYPE ## @-> a helper task to test a required var
+task-which-requires-a-var: demand_var-ENV_TYPE ## @-> A helper task to test a required variable.
 	@echo ${ENV_TYPE}
 
 .PHONY: spawn_tgt_project ## @-> Spawn a complete new project from this one.
@@ -55,6 +55,7 @@ spawn_tgt_project: demand_var-TGT_PROJ zip_me
 	-rm -r $(shell echo $(dir $(abspath $(dir $$PWD)))$$TGT_PROJ)
 	unzip -o ../min-jinja.zip -d $(shell echo $(dir $(abspath $(dir $$PWD)))$$TGT_PROJ)
 	to_srch=min-jinja to_repl=$(shell echo $$TGT_PROJ) dir_to_morph=$(shell echo $(dir $(abspath $(dir $$PWD)))$$TGT_PROJ) ./run -a do_morph_dir
+	cd $(shell echo $(dir $(abspath $(dir $$PWD)))$$TGT_PROJ) ; git init ; cd -
 
 .PHONY: do_prune_docker_system ## @-> Stop, remove and clean all containers and non used resources in the docker.
 do_prune_docker_system:
@@ -68,4 +69,4 @@ generate_templates: demand_var-ENV_TYPE
 
 .PHONY: do_generate_templates ## @-> Generate the templates for all the *.tpl files in the project in the docker devops container.
 do_generate_templates: demand_var-ENV_TYPE
-	docker exec -e ENV_TYPE=$$ENV_TYPE -it proj-con ./run -a do_generate_templates
+	docker exec -e ENV_TYPE=$$ENV_TYPE -it min-jinja ./run -a do_generate_templates

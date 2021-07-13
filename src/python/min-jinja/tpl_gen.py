@@ -16,7 +16,7 @@ from jinja2 import Environment, BaseLoader, exceptions
 from pprintjson import pprintjson as ppjson
 from colorama import Fore, Style
 
-product_dir, tgt_proj_dir, json_cnf_fle, cnf, pp, = '', '', '', '', ''
+product_dir, tgt_proj_dir, json_cnf_fle, cnf, pp, env_type = '', '', '', '', '', ''
 
 
 def main():
@@ -39,14 +39,14 @@ def print_success(msg):
 
 def set_vars():
     try:
-        global product_dir, json_cnf_fle, cnf, pp, cnf, tgt_proj_dir
+        global product_dir, json_cnf_fle, cnf, pp, cnf, tgt_proj_dir, env_type
         pp = pprint.PrettyPrinter(indent=3)
         product_dir = path.abspath(path.join(__file__, "..", "..", "..", ".."))
         product_name = re.sub(r'(.*)[//](.*)(.*?)$', r'\2',product_dir)
-        env = os.getenv('ENV_TYPE')
+        env_type = os.getenv('ENV_TYPE')
         tgt_proj = product_name
         tgt_proj_dir = product_dir
-        json_cnf_fle = product_dir + '/cnf/env/' + env + '.env.json'
+        json_cnf_fle = product_dir + '/cnf/env/' + env_type + '.env.json'
 
         print("tpl_gen.py ::: using config json file: ", str(json_cnf_fle))
         print(time.sleep(1))
@@ -61,21 +61,6 @@ def set_vars():
         sys.exit(1)
 
 
-def do_read_conf_fle(f):
-    try:
-        with open(f, 'r') as fh:
-            vars_dict = dict(
-                tuple(line.rstrip().split('='))
-                for line in fh.readlines() if not line.startswith('#') and not line.startswith('\n')
-            )
-        os.environ.update(vars_dict)
-    except (Exception) as error:
-        print_error(f'ERROR in do_read_conf_fle:{error}')
-        traceback.print_stack()
-    finally:
-        print("RUNNING in the following env: ", vars_dict)
-
-
 def do_generate(cnf):
     pathnames = [
         f'{product_dir}/src/tpl/**/*.tpl',
@@ -84,21 +69,15 @@ def do_generate(cnf):
     for pathname in pathnames:
         for f in glob.iglob(pathname, recursive=True):
             try:
-                # print ( "read template file: " , f)
-                # pp.pprint (cnf)
                 str_tpl = open(f, 'r').read()
                 obj_tpl = Environment(loader=BaseLoader).from_string(str_tpl)
                 vars = os.environ.copy()
                 vars.update(cnf['env'])
                 rendered = obj_tpl.render(vars)
-                # print(cnf)
-                # pp.pprint ( rendered )
-                tgt_fle = f.replace('/src/tpl', '', 1).replace('.tpl', '').replace(r'%env%', cnf['env']['ENV_TYPE'])
+                tgt_fle = f.replace('/src/tpl', '', 1).replace('.tpl', '').replace(r'%env%', env_type)
                 if not os.path.exists(os.path.dirname(tgt_fle)):
                     os.makedirs(os.path.dirname(tgt_fle))
-                # print (rendered)
                 print(rendered,  file=open(tgt_fle, 'w'))
-                # print ( "output ready rendered file : " , tgt_fle)
                 print_success(f'File "{tgt_fle}" rendered with success.')
             except exceptions.UndefinedError as undef_err:
                 print_warn(
