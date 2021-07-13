@@ -1,5 +1,13 @@
+# python
+*.pyc
+
 # poetry
 .venv/
+
+# pytest
+dat/tests_report/python/*
+!dat/tests_report/python/.gitkeep
+.pytest_cache/
 
 # generated demo
 src/bash/demo/*

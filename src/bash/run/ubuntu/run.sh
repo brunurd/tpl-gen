@@ -99,7 +99,7 @@ do_run_actions(){
 do_log(){
    type_of_msg=$(echo $*|cut -d" " -f1)
    msg="$(echo $*|cut -d" " -f2-)"
-   log_dir="${PRODUCT_DIR:-}/dat/log/bash" ; mkdir -p $log_dir \
+   log_dir="${PRODUCT_DIR:-}/dat/logs/bash" ; mkdir -p $log_dir \
       && log_file="$log_dir/${RUN_UNIT:-}.`date "+%Y%m"`.log"
    echo " [$type_of_msg] `date "+%Y-%m-%d %H:%M:%S %Z"` [${RUN_UNIT:-}][@${host_name:-}] [$$] $msg " \
       | tee -a $log_file
@@ -137,7 +137,6 @@ do_set_vars(){
 }
 
 do_read_conf_section(){
-   echo $ENV_TYPE
    PROJ_CONF_FILE=$PRODUCT_DIR/cnf/env/$ENV_TYPE.env.json
    test -f $PROJ_CONF_FILE || {
       do_log "FATAL could NOT find the configuration file: $PROJ_CONF_FILE"

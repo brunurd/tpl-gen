@@ -70,3 +70,11 @@ generate_templates: demand_var-ENV_TYPE
 .PHONY: do_generate_templates ## @-> Generate the templates for all the *.tpl files in the project in the docker devops container.
 do_generate_templates: demand_var-ENV_TYPE
 	docker exec -e ENV_TYPE=$$ENV_TYPE -it min-jinja ./run -a do_generate_templates
+
+.PHONY: lint ## @-> Run pylint in python files.
+lint:
+	ENV_TYPE=$$ENV_TYPE ./run -a do_run_pylint_in_python_files
+
+.PHONY: test ## @-> Run the project tests.
+test: demand_var-ENV_TYPE
+	ENV_TYPE=$$ENV_TYPE ./run -a do_run_python_tests
