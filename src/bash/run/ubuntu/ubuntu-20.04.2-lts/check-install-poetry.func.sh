@@ -1,10 +1,13 @@
 #!/bin/bash
 do_check_install_poetry(){
-   export POETRY_VERSION=1.1.6
+   ver=$(poetry --version 2>/dev/null) ; err=$?
+   test $err -eq 0 && ver="${ver//Poetry version /}"
 
-   command -v poetry 1>/dev/null || {
+   export POETRY_VERSION=1.1.7
+
+   test "$ver" != $POETRY_VERSION && {
       curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-      sudo ln -s $HOME/.poetry/bin/poetry /usr/bin/poetry
+      sudo ln -s "$HOME/.poetry/bin/poetry" /usr/bin/poetry
       sudo chmod 700 /usr/bin/poetry
    }
 

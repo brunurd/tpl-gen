@@ -1,6 +1,10 @@
 # poetry
 .venv/
 
+# generated demo
+src/bash/demo/*
+!src/bash/demo/.gitkeep
+
 # misc
 .env
 *.log

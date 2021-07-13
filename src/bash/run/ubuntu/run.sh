@@ -90,10 +90,6 @@ do_run_actions(){
    done < <(echo "$run_funcs")
 }
 
-do_flush_screen(){
-   printf "\033[2J";printf "\033[0;0H"
-}
-
 #------------------------------------------------------------------------------
 # echo pass params and print them to a log file and terminal
 # usage:
