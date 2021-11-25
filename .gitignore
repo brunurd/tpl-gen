@@ -1,5 +1,6 @@
 # poetry
 .venv/
+**/__pycache__/
 
 # misc
 .env
