@@ -1,4 +1,4 @@
-# v0.4.9
+#!/bin/bash
 #------------------------------------------------------------------------------
 # Purpose: 
 # to search for a string and replace it with another recursively in a dir
@@ -9,7 +9,7 @@
 # export to_repl=<<the-string-to-replace-with>>
 # while read -r f ; do cp -v $f $(echo $f|perl -ne 's#func#help#g;print'|perl -ne
 # 's#src#doc#g;print'|perl -ne 's#bash#txt#g;print'|perl -ne 's#help.sh#help.txt#g;print') ; done <
-# <(find src/bash/qto/funcs/ -type f)
+# <(find src/bash/run/ -type f)
 #------------------------------------------------------------------------------
 do_morph_dir(){
 
@@ -81,4 +81,4 @@ do_morph_dir(){
 
 }
 
-#eof file: ./src/bash/kafka-poc/funcs/morph-dir.func.sh
+#eof file: src/bash/run/morph-dir.func.sh

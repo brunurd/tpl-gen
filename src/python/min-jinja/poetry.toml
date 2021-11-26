@@ -1,3 +1,0 @@
-[tool.poetry.virtualenvs]
-in-project = true
-venv = { python = "3.8" }
